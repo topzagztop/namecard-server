@@ -3,18 +3,22 @@ require('dotenv').config()
 // import
 const express = require("express");
 const cors = require("cors")
+const morgan = require('morgan');
 const errorHandler = require("./middleware/error")
 const notFoundHandler = require("./middleware/not-found");
 
 
+
 // import Router
 const authRouter = require('./routes/auth-routes');
-const userRouter = require("./routes/user-routes")
+const userRouter = require("./routes/user-routes");
+
 
 // express setting
 const app = express();
 app.use(cors())
 app.use(express.json())
+app.use(morgan())
 
 // Router
 app.use("/auth", authRouter)

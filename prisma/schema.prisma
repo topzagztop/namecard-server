@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model User {
+  id           Int        @id @default(autoincrement())
+  email        String     @unique
+  password     String
+  firstName    String     @map("first_name")
+  lastName     String     @map("last_name")
+  tel          String
+  profileImage String     @map("profile_image")
+  role         Role       @default(USER)
+  namecard     NameCard[]
+  contact      Contact[]
+
+  @@map("user")
+}
+
+model NameCard {
+  id            Int          @id @default(autoincrement())
+  businessName  String       @map("bussiness_name")
+  position      String
+  businessTel   String       @map("business_tel")
+  businessEmail String       @map("business_email")
+  logo          String
+  website       String
+  userId        Int          @map("user_id")
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  themeId       Int          @map("theme_id")
+  theme         Theme        @relation(fields: [themeId], references: [id], onDelete: Cascade)
+  categoryId    Int          @map("category_id")
+  category      Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  sociallinked  SocialLink[]
+
+  @@map("name_card")
+}
+
+model SocialLink {
+  id         Int      @id @default(autoincrement())
+  line       String?
+  facebook   String?
+  instagram  String?
+  whatsapp   String?
+  messenger  String?
+  namecardId Int      @map("namecard_id")
+  namecard   NameCard @relation(fields: [namecardId], references: [id], onDelete: Cascade)
+
+  @@map("social_link")
+}
+
+model Contact {
+  id                 Int                @id @default(autoincrement())
+  contactName        String             @map("contact_name")
+  userId             Int                @map("user_id")
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businesscategories BusinessCategory[]
+
+  @@map("contact")
+}
+
+model Theme {
+  id        Int        @id @default(autoincrement())
+  themeName String     @map("theme_name")
+  namecard  NameCard[]
+
+  @@map("theme")
+}
+
+model Category {
+  id                 Int                @id @default(autoincrement())
+  name               String
+  namecard           NameCard[]
+  businesscategories BusinessCategory[]
+
+  @@map("category")
+}
+
+model BusinessCategory {
+  id         Int      @id @default(autoincrement())
+  categoryId Int      @map("category_id")
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  contactId  Int      @map("contact_id")
+  contact    Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@map("business_category")
+}
