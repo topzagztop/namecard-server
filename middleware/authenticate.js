@@ -4,35 +4,31 @@ const prisma = require("../configs/prisma");
 
 const authenticate = async (req, res, next) => {
   try {
-    const autherization = req.headers.autherization;
+    const authorization = req.headers.authorization
 
-    if (!autherization || !autherization.startWith("Bearer")) {
-      return createError(401, "Unautherization");
+    if(!authorization || !authorization.startsWith('Bearer ')) {
+      return createError(401, "Unauthorized")
     }
 
-    const token = autherization.split(" ")[1];
-
-    if (!token) {
-      return createError(401, "Unautherization");
+    const token = authorization.split(" ")[1]
+    if(!token) {
+      return createError(401, "Unauthorized")
     }
 
-    const jwtPayload = jwt.verify(token, process.env.SECRET_KEY);
+    const payload = jwt.verify(token, process.env.SECRET_KEY)
 
-    const user = await prisma.user.findFirst({
+    const foundUser = await prisma.user.findUnique({
       where: {
-        id: jwtPayload.id,
-      },
-    });
+        id: payload.id
+      }
+    })
 
-    if (!user) {
-      return createError(400, "User not found");
-    }
+    const {password, phone, email, ...userData} = foundUser
 
-    delete user.password;
+    req.user = userData
 
-    req.user = user;
+    next()
 
-    next();
   } catch (err) {
     next(err);
   }

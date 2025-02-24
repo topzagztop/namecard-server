@@ -3,7 +3,11 @@ const fs = require("fs");
 const prisma = require("../configs/prisma")
 
 exports.getProfile = (req, res, next) => {
-  res.json({ user: req.user });
+  try {
+    res.json({ user: req.user });
+  } catch (err) {
+    next(err)
+  }
 };
 
 exports.updateProfile = async (req, res, next) => {

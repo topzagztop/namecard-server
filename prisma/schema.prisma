@@ -19,16 +19,16 @@ enum Role {
 }
 
 model User {
-  id           Int        @id @default(autoincrement())
-  email        String     @unique
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
   password     String
-  firstName    String     @map("first_name")
-  lastName     String     @map("last_name")
-  tel          String
-  profileImage String     @map("profile_image")
-  role         Role       @default(USER)
-  namecard     NameCard[]
-  contact      Contact[]
+  firstName    String        @map("first_name")
+  lastName     String        @map("last_name")
+  phone        String
+  profileImage String?       @map("profile_image")
+  role         Role          @default(USER)
+  namecards    NameCard[]
+  ContactList  ContactList[]
 
   @@map("user")
 }
@@ -40,25 +40,25 @@ model NameCard {
   businessTel   String       @map("business_tel")
   businessEmail String       @map("business_email")
   logo          String
-  website       String
+  website       String?
+  slug          String       @unique @default(uuid())
+  qrcode        Int          @default(0)
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt     DateTime     @updatedAt @map("updated_at") @db.Timestamp(0)
   userId        Int          @map("user_id")
   user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   themeId       Int          @map("theme_id")
   theme         Theme        @relation(fields: [themeId], references: [id], onDelete: Cascade)
-  categoryId    Int          @map("category_id")
-  category      Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  sociallinked  SocialLink[]
+  socialLinked  SocialLink[]
+  Contact       Contact[]
 
   @@map("name_card")
 }
 
 model SocialLink {
   id         Int      @id @default(autoincrement())
-  line       String?
-  facebook   String?
-  instagram  String?
-  whatsapp   String?
-  messenger  String?
+  socialName String?  @map("social_name")
+  url        String
   namecardId Int      @map("namecard_id")
   namecard   NameCard @relation(fields: [namecardId], references: [id], onDelete: Cascade)
 
@@ -66,13 +66,23 @@ model SocialLink {
 }
 
 model Contact {
-  id                 Int                @id @default(autoincrement())
-  contactName        String             @map("contact_name")
-  userId             Int                @map("user_id")
-  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  businesscategories BusinessCategory[]
+  id          Int           @id @default(autoincrement())
+  namecardId  Int           @map("namecard_id")
+  namecard    NameCard      @relation(fields: [namecardId], references: [id], onDelete: Cascade)
+  contactList ContactList[]
 
   @@map("contact")
+}
+
+model ContactList {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(0)
+  userId    Int      @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contactId Int      @map("contact_id")
+  contacts  Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@map("contact_list")
 }
 
 model Theme {
@@ -81,23 +91,4 @@ model Theme {
   namecard  NameCard[]
 
   @@map("theme")
-}
-
-model Category {
-  id                 Int                @id @default(autoincrement())
-  name               String
-  namecard           NameCard[]
-  businesscategories BusinessCategory[]
-
-  @@map("category")
-}
-
-model BusinessCategory {
-  id         Int      @id @default(autoincrement())
-  categoryId Int      @map("category_id")
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  contactId  Int      @map("contact_id")
-  contact    Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
-
-  @@map("business_category")
 }
