@@ -24,6 +24,7 @@ model User {
   password     String
   firstName    String        @map("first_name")
   lastName     String        @map("last_name")
+  jobPosition  String        @map("job_position")
   phone        String
   profileImage String?       @map("profile_image")
   role         Role          @default(USER)
@@ -34,23 +35,24 @@ model User {
 }
 
 model NameCard {
-  id            Int          @id @default(autoincrement())
-  businessName  String       @map("bussiness_name")
-  position      String
-  businessTel   String       @map("business_tel")
-  businessEmail String       @map("business_email")
-  logo          String
-  website       String?
-  slug          String       @unique @default(uuid())
-  qrcode        Int          @default(0)
-  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamp(0)
-  updatedAt     DateTime     @updatedAt @map("updated_at") @db.Timestamp(0)
-  userId        Int          @map("user_id")
-  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  themeId       Int          @map("theme_id")
-  theme         Theme        @relation(fields: [themeId], references: [id], onDelete: Cascade)
-  socialLinked  SocialLink[]
-  Contact       Contact[]
+  id              Int          @id @default(autoincrement())
+  businessName    String       @map("bussiness_name")
+  position        String
+  businessTel     String       @map("business_tel")
+  businessEmail   String       @map("business_email")
+  logo            String
+  businessProfile String       @map("business_profile")
+  website         String?
+  slug            String       @unique
+  qrcode          String       @map("qrcode") @db.Text
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamp(0)
+  updatedAt       DateTime     @updatedAt @map("updated_at") @db.Timestamp(0)
+  userId          Int          @map("user_id")
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  themeId         Int          @map("theme_id")
+  theme           Theme        @relation(fields: [themeId], references: [id], onDelete: Cascade)
+  socialLinked    SocialLink[]
+  Contact         Contact[]
 
   @@map("name_card")
 }
@@ -58,7 +60,7 @@ model NameCard {
 model SocialLink {
   id         Int      @id @default(autoincrement())
   socialName String?  @map("social_name")
-  url        String
+  url        String?
   namecardId Int      @map("namecard_id")
   namecard   NameCard @relation(fields: [namecardId], references: [id], onDelete: Cascade)
 

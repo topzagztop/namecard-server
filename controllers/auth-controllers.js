@@ -7,7 +7,7 @@ const cloudinary = require("../configs/cloudinary")
 
 exports.register = async (req, res, next) => {
   try {
-    const { email, password, firstName, lastName, phone } = req.body;
+    const { email, password, firstName, lastName, jobPosition, phone } = req.body;
 
     const isUserExist = await prisma.user.findFirst({
       where: {
@@ -32,6 +32,7 @@ exports.register = async (req, res, next) => {
         firstName: firstName,
         lastName: lastName,
         phone: phone,
+        jobPosition: jobPosition,
         profileImage: profileImage?.secure_url,
       },
     });
@@ -64,19 +65,17 @@ exports.login = async (req, res, next) => {
 
     const payload = {
       id: user.id,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role: user.role
     }
 
     const token = jwt.sign(payload, process.env.SECRET_KEY, {
       expiresIn: process.env.EXPIRES_IN,
     });
 
+    const { password: pw, email: em, phone, role, ...userData } = user;
+
     res.json({
       message: "Login Success",
-      payload: payload,
+      user: userData,
       token: token,
     });
   } catch (err) {
