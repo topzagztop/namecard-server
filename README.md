@@ -12,8 +12,8 @@ SECRET_KEY=***
 |/auth/register |post |-|-|-|{email, passowrd, firstname, lastname, phone, profile(file)}
 |/auth/login|post|-|-|-|{email, password}
 |/auth/logout|post|-|-|-|-
-|/auth/me|get|y|-|-|-|
-|/users/:id|put|y|-|-|{email, username, passowrd, firstname, lastname, phone, profile(file)}|
+|/user/me|get|y|-|-|-|
+|/user/update|patch|y|-|-|{firstName, lastName, jobPosition, phone, profileImage(file)}|
 |/cards/me|get|y|-|-|-|
 |/cards/create|post|y|-|-|{businessName, position, businessTel, businessEmail, logo(file), website, line, facebook, instagram, linkedin }|
 |/cards/:id|put|y|-|-|{businessName, position, businessTel, businessEmail, logo(file), website, line, facebook, instagram, linkedin}

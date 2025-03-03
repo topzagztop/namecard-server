@@ -5,7 +5,7 @@ const userController = require("../controllers/user-controllers");
 
 const router = express.Router();
 
-router.get("/", authenticate, userController.getProfile)
-router.put("/", authenticate, upload.single("profile"), userController.updateProfile)
+router.get("/me", authenticate, userController.getProfile)
+router.patch("/update", authenticate, upload.single("profileImage"), userController.updateProfile)
 
 module.exports = router

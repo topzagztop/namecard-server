@@ -23,7 +23,7 @@ const authenticate = async (req, res, next) => {
       }
     })
 
-    const {password, phone, email, ...userData} = foundUser
+    const {password, email, ...userData} = foundUser
 
     req.user = userData
 

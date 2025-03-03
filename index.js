@@ -12,6 +12,7 @@ const authRouter = require('./routes/auth-routes');
 const userRouter = require("./routes/user-routes");
 const cardRouter = require("./routes/card-routes")
 const themeRouter = require("./routes/theme-routes")
+const contactRouter = require("./routes/contact-routes")
 
 // express setting
 const app = express();
@@ -22,11 +23,9 @@ app.use(morgan("dev"))
 // Router
 app.use("/auth", authRouter)
 app.use("/user", userRouter)
-app.use("/cards", cardRouter)
+app.use("/card", cardRouter)
 app.use("/theme", themeRouter)
-app.use("/contacts-list", (req, res) => {
-    res.json({message: "Social link of facebook & instagram & whatsapp & messenger & line"})
-})
+app.use("/contact", contactRouter)
 
 // Error Case
 app.use(errorHandler)

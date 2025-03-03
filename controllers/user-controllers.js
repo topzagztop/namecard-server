@@ -12,14 +12,18 @@ exports.getProfile = (req, res, next) => {
 
 exports.updateProfile = async (req, res, next) => {
   try {
-    const image = req.file
+    const { firstName, lastName, jobPosition, phone } = req.body
+
+    const profileImage = req.file
       ? await cloudinary.uploader.upload(req.file.path)
       : null;
 
     const toUpdateInputs = {
       firstName,
       lastName,
-      profileImage: image?.secure_url
+      jobPosition,
+      phone,
+      profileImage: profileImage?.secure_url
     }
 
     for (let key in toUpdateInputs) {
