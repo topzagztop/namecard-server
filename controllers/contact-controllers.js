@@ -3,83 +3,100 @@ const createError = require("../utils/createError")
 
 exports.addContact = async (req, res, next) => {
     try {
-        const {namecardId } = req.body
-        const userId = req.user.id
+        const { namecardId } = req.body;
+        const userId = req.user.id;
 
-        const nameCardData = await prisma.nameCard.findUnique({
-            where: {id: Number(namecardId)},
-        })
+        const existingNameCard = await prisma.nameCard.findUnique({
+            where: { id: namecardId }
+        });
 
-        if(!nameCardData) {
-            return createError(404, "NameCard not found")
+        if (!existingNameCard) {
+            return createError(404, "NameCard not found");
         }
 
-        const contact = await prisma.contact.upsert({
-            where: {namecardId: Number(namecardId)},
-            update: {},
-            create: {namecardId: Number(namecardId)}
-        })
+        let contact = await prisma.contact.findFirst({
+            where: { namecardId }
+        });
+
+        if (!contact) {
+            contact = await prisma.contact.create({
+                data: {
+                    namecardId
+                }
+            });
+        }
+
+        const existingContactList = await prisma.contactList.findFirst({
+            where: {
+                userId: userId,
+                contactId: contact.id
+            }
+        });
+
+        if (existingContactList) {
+            return createError(400, "This NameCard is already added to your contacts.")
+        }
 
         const newContactList = await prisma.contactList.create({
             data: {
                 userId: userId,
-                contactId: contact.id,
+                contactId: contact.id
             }
-        })
-
-        res.json({
-          message: "Add Contact Successful!",
-          contact: newContactList,
         });
 
+        res.json({ message: "Contact added successfully!", contactList: newContactList });
     } catch (err) {
-        next(err)
+        console.error(err);
+        next(err);
     }
-}
+};
 
-exports.getContact = async (req, res, next) => {
+exports.getContacts = async (req, res, next) => {
     try {
-        const userId = req.user.id
+        const { userId } = req.params;
 
         const contacts = await prisma.contactList.findMany({
-            where: {userId: userId},
+            where: { userId: parseInt(userId) },
             include: {
+                user: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                        profileImage: true,
+                    }
+                },
                 contacts: {
                     include: {
                         namecard: true
                     }
                 }
             }
-        })
+        });
 
-        res.json({message: "Get Contacts Successful", contacts: contacts})
+        if (!contacts || contacts.length === 0) {
+            return res.json({message: "No contacts found", contacts: []})
+        }
+
+
+        res.json({ message: "Get Contacts Successful", contacts });
     } catch (err) {
-        next(err)
+        console.error(err);
+        next(err);
     }
-}
+};
+
 
 exports.deleteContact = async (req, res, next) => {
     try {
-        const {id} = req.params
+        const { id } = req.params;
 
-        const userId = req.user.id
-
-        const contactData = await prisma.contactList.findFirst({
-            where: {
-                id: Number(id),
-                userId: userId
-            }
-        })
-        if (!contactData) {
-            return res.status(404).json({ message: "Contact not found" });
-        }
-
-        await prisma.contactList.delete({
-            where: { id: Number(id) },
+        await prisma.contact.delete({
+            where: { id: parseInt(id) }
         });
 
-        res.json({message: "Delete Contact Successful"})
+        res.json({ message: "Contact deleted successfully!" });
     } catch (err) {
-        next(err)
+        console.error(err);
+        next(err);
     }
-}
+};
