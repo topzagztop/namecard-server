@@ -14,6 +14,7 @@ router.patch("/editnamecard/:id",
     authenticate, cardControllers.editCard)
 router.delete("/:id", authenticate, cardControllers.deleteCard)
 router.get("/:id", authenticate, cardControllers.getCardById)
+router.get("/namecard/:slug", cardControllers.getCardBySlug)
 
 
 module.exports = router

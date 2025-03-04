@@ -46,7 +46,7 @@ exports.addContact = async (req, res, next) => {
 
         res.json({ message: "Contact added successfully!", contactList: newContactList });
     } catch (err) {
-        console.error(err);
+        console.log(err);
         next(err);
     }
 };
@@ -80,7 +80,7 @@ exports.getContacts = async (req, res, next) => {
 
         res.json({ message: "Get Contacts Successful", contacts });
     } catch (err) {
-        console.error(err);
+        console.log(err);
         next(err);
     }
 };
@@ -96,7 +96,7 @@ exports.deleteContact = async (req, res, next) => {
 
         res.json({ message: "Contact deleted successfully!" });
     } catch (err) {
-        console.error(err);
+        console.log(err);
         next(err);
     }
 };

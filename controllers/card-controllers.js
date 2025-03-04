@@ -237,3 +237,34 @@ exports.deleteCard = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getCardBySlug = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+
+    const nameCardSlug = await prisma.nameCard.findUnique({
+      where: { 
+        slug: slug
+      },
+      include: { 
+        socialLinked: true, 
+        theme: true,
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            profileImage: true
+          }
+        }
+      },
+    });
+
+    if(!nameCardSlug) {
+      return createError(404, "NameCard not found")
+    }
+
+    res.json({ message: "Get NameCard Successful", data: nameCardSlug });
+  } catch (err) {
+    next(err);
+  }
+};
